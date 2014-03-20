@@ -69,7 +69,7 @@ public class TwilioImplementation implements SendSMSCommand {
         SmsFactory messageFactory = client.getAccount().getSmsFactory();
         try {
             Sms sms = messageFactory.create(params);
-        } catch (TwilioRestException ex) {
+        } catch (TwilioRestException ex) { 
             fromNumbers.offer(fNum);
             throw new FailedToSendSMSException("Failed to send to " + toNumber.getPhoneNumber(), ex);
         } finally {
