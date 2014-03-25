@@ -161,7 +161,7 @@ public class TwilioImplementation implements SendSMSCommand {
     
     public static String getExecutablePath(){
         String pa = System.getProperty("java.class.path");
-        if(pa.contains("Link/build/classes:")) pa = ".";
+        if(pa.contains("Link"+System.getProperty("file.separator")+"build")) pa = ".";
         File f = new File(pa);
         File dir = f.getAbsoluteFile().getParentFile();
         String path = dir.toString()+System.getProperty("file.separator");
