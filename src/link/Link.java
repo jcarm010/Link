@@ -29,7 +29,6 @@ public class Link {
         Map<PhoneNumber,List<SMS>> failed = test.sendSMS(msg,toNum);
         for(Entry<PhoneNumber,List<SMS>> entry : failed.entrySet()){
             System.out.println("Failed - "+entry.getKey()+": "+entry.getValue());
-        }
-        
+        }        
     }
 }
