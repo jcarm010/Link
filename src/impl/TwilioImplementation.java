@@ -24,8 +24,8 @@ import java.util.Scanner;
  */
 public class TwilioImplementation implements SendSMSCommand {
 
-    private static String ACCOUNT_SID = "ACe49b6b48575e9bc0e723d91faa603f69";
-    private static String AUTH_TOKEN = "18e17a6957f91330416999355a2d3037";
+    private static String ACCOUNT_SID = "AC774b30088f75396c61f094ee3758e475";
+    private static String AUTH_TOKEN = "2c7f7958cd21aadc79a34caf41474f6e";
     private static Queue<String> fromNumbers = new LinkedList<>();
     private TwilioRestClient client;
 

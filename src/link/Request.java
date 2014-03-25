@@ -1,11 +1,18 @@
 package link;
 
+import abstr.PhoneNumber;
+import abstr.SMS;
+import abstr.SendSMSCommand;
+import impl.SMSFactory;
+import impl.TwilioImplementation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -78,9 +85,37 @@ public class Request {
         }
         return ret;
     }
-    public static void main(String[] args){
+    public List<PhoneNumber> loadPhoneNumber(){
         Request req = new Request();
         List<RequestData> lst = req.getXML();
-        System.out.println(lst);
+        
+        ArrayList<PhoneNumber> toNumber = new ArrayList<>();
+        
+        for (int i = 0 ; i < lst.size() ; i++) {
+            toNumber.add(new PhoneNumber(lst.get(i).to));       
+        }
+        return toNumber;
+    }
+    public List<SMS> loadMessage(){
+        Request req = new Request();
+        List<RequestData> lst = req.getXML();
+        
+        List<SMS> msg = new ArrayList<>();
+        
+        for (int i = 0 ; i<lst.size() ; i++) {
+            msg.add(new SMS(lst.get(i).txt));
+        }    
+        return msg;
+    }
+    public static void main(String[] args){
+        Request req = new Request();
+        SendSMSCommand test = SMSFactory.getSMSCommand();
+        List<PhoneNumber> toNum = req.loadPhoneNumber();
+        List<SMS> msg = req.loadMessage();
+  
+        Map<PhoneNumber,List<SMS>> failed = test.sendSMS(msg,toNum);
+        for(Map.Entry<PhoneNumber,List<SMS>> entry : failed.entrySet()){
+            System.out.println("Failed - "+entry.getKey()+": "+entry.getValue());
+        }
     }
 }
