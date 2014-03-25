@@ -6,7 +6,7 @@ import abstr.SendSMSCommand;
  * Creates implementation independent SMS related objects.
  * @author javier
  */
-public class SMSFactory {//panthertext//Messages14!
+public class SMSFactory {
     /**
      * Generates a SendSMSCommand.
      * @return A SendSMSCommand
