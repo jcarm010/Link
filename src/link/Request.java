@@ -3,6 +3,7 @@ package link;
 import abstr.PhoneNumber;
 import abstr.SMS;
 import abstr.SendSMSCommand;
+import abstr.exceptions.FailedToSendSMSException;
 import impl.SMSFactory;
 import impl.TwilioImplementation;
 import java.io.IOException;
@@ -22,19 +23,23 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Request {
-    
-    public Request(){
-        
+
+    public Request() {
+
     }
-    public class RequestData{
+
+    public class RequestData {
+
         public String to;
         public String txt;
         public String id;
-        public String toString(){
-            return "to: "+to+" text: "+txt+" id: "+id;
+
+        public String toString() {
+            return "to: " + to + " text: " + txt + " id: " + id;
         }
     }
-    public List<RequestData> getXML(){
+
+    public List<RequestData> getXML() {
         List<RequestData> lst = new LinkedList<>();
         URL xmlUrl;
         try {
@@ -42,22 +47,28 @@ public class Request {
             InputStream in = xmlUrl.openStream();
             Document doc = parse(in);
             NodeList messages = doc.getElementsByTagName("message");
-            if(messages!=null){
-                for(int i = 0 ; i < messages.getLength();i++){
+            if (messages != null) {
+                for (int i = 0; i < messages.getLength(); i++) {
                     Node msg = messages.item(i);
                     NodeList data = msg.getChildNodes();
                     RequestData obj = new RequestData();
-                    for(int j = 0;j<data.getLength();j++){
+                    for (int j = 0; j < data.getLength(); j++) {
                         Node inf = data.item(j);
-                        switch(inf.getNodeName()){
-                            case "to":obj.to = inf.getTextContent();break;
-                            case "text":obj.txt = inf.getTextContent();break;
-                            case "id":obj.id = inf.getTextContent();break;
+                        switch (inf.getNodeName()) {
+                            case "to":
+                                obj.to = inf.getTextContent();
+                                break;
+                            case "text":
+                                obj.txt = inf.getTextContent();
+                                break;
+                            case "id":
+                                obj.id = inf.getTextContent();
+                                break;
                         }
                     }
                     lst.add(obj);
                 }
-            }else{
+            } else {
                 //todo
             }
         } catch (MalformedURLException ex) {
@@ -67,7 +78,8 @@ public class Request {
         }
         return lst;
     }
-    public Document parse (InputStream is) {
+
+    public Document parse(InputStream is) {
         Document ret = null;
         DocumentBuilderFactory domFactory;
         DocumentBuilder builder;
@@ -79,43 +91,44 @@ public class Request {
             builder = domFactory.newDocumentBuilder();
 
             ret = builder.parse(is);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             System.err.println("unable to load XML: " + ex);
         }
         return ret;
     }
-    public List<PhoneNumber> loadPhoneNumber(){
+
+    public List<PhoneNumber> loadPhoneNumber() {
         Request req = new Request();
         List<RequestData> lst = req.getXML();
-        
+
         ArrayList<PhoneNumber> toNumber = new ArrayList<>();
-        
-        for (int i = 0 ; i < lst.size() ; i++) {
-            toNumber.add(new PhoneNumber(lst.get(i).to));       
+
+        for (RequestData lst1 : lst) {
+            toNumber.add(new PhoneNumber(lst1.to));
         }
         return toNumber;
     }
-    public List<SMS> loadMessage(){
+
+    public List<SMS> loadMessage() {
         Request req = new Request();
         List<RequestData> lst = req.getXML();
-        
+
         List<SMS> msg = new ArrayList<>();
-        
-        for (int i = 0 ; i<lst.size() ; i++) {
-            msg.add(new SMS(lst.get(i).txt));
-        }    
+
+        for (RequestData lst1 : lst) {
+            msg.add(new SMS(lst1.txt));
+        }
         return msg;
     }
-    public static void main(String[] args){
+
+    public static void main(String[] args) throws FailedToSendSMSException {
         Request req = new Request();
         SendSMSCommand test = SMSFactory.getSMSCommand();
         List<PhoneNumber> toNum = req.loadPhoneNumber();
         List<SMS> msg = req.loadMessage();
-  
-        Map<PhoneNumber,List<SMS>> failed = test.sendSMS(msg,toNum);
-        for(Map.Entry<PhoneNumber,List<SMS>> entry : failed.entrySet()){
-            System.out.println("Failed - "+entry.getKey()+": "+entry.getValue());
+
+        for (int i = 0; i < msg.size() && i < toNum.size(); i++) {   
+                test.sendSMS(msg.get(i), toNum.get(i));
         }
     }
 }
