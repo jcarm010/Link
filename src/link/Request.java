@@ -23,11 +23,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Request {
-
-    public Request() {
-
-    }
-
     public class RequestData {
 
         public String to;
@@ -95,40 +90,5 @@ public class Request {
             System.err.println("unable to load XML: " + ex);
         }
         return ret;
-    }
-
-    public List<PhoneNumber> loadPhoneNumber() {
-        Request req = new Request();
-        List<RequestData> lst = req.getXML();
-
-        ArrayList<PhoneNumber> toNumber = new ArrayList<>();
-
-        for (RequestData lst1 : lst) {
-            toNumber.add(new PhoneNumber(lst1.to));
-        }
-        return toNumber;
-    }
-
-    public List<SMS> loadMessage() {
-        Request req = new Request();
-        List<RequestData> lst = req.getXML();
-
-        List<SMS> msg = new ArrayList<>();
-
-        for (RequestData lst1 : lst) {
-            msg.add(new SMS(lst1.txt));
-        }
-        return msg;
-    }
-
-    public static void main(String[] args) throws FailedToSendSMSException {
-        Request req = new Request();
-        SendSMSCommand test = SMSFactory.getSMSCommand();
-        List<PhoneNumber> toNum = req.loadPhoneNumber();
-        List<SMS> msg = req.loadMessage();
-
-        for (int i = 0; i < msg.size() && i < toNum.size(); i++) {   
-                test.sendSMS(msg.get(i), toNum.get(i));
-        }
     }
 }
