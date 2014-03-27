@@ -8,6 +8,8 @@ import impl.SMSFactory;
 import impl.TwilioImplementation;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -90,5 +92,25 @@ public class Request {
             System.err.println("unable to load XML: " + ex);
         }
         return ret;
+    }
+    public void checkFlag() {
+        RequestData obj = new RequestData();
+               
+        String urlText = "http://panthertext.com/scripts/check_flag.php";
+        String someXmlContent = "<root>Flag<node>"+obj.id+"</node><node>sent</node></root>";
+        try {
+            HttpURLConnection c = (HttpURLConnection) new URL(urlText).openConnection();
+            c.setDoOutput(true);
+            OutputStreamWriter writer = new OutputStreamWriter(c.getOutputStream(), "UTF-8");
+            writer.write(someXmlContent);
+            writer.close();
+            InputStream is = c.getInputStream();
+            int in;
+            while((in=is.read())!=-1)
+                System.out.println((char)in);
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
