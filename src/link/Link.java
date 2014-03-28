@@ -19,7 +19,7 @@ import java.util.List;
 public class Link {
     public static void main(String[] args) {      
         Request req = new Request();
-        req.checkFlag();
+        req.sendResults();
 //        SendSMSCommand comand = SMSFactory.getSMSCommand();
 //        List<Request.RequestData> lst = req.getXML();
 //        for (Request.RequestData d : lst) {

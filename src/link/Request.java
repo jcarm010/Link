@@ -1,42 +1,46 @@
 package link;
 
-import abstr.PhoneNumber;
-import abstr.SMS;
-import abstr.SendSMSCommand;
-import abstr.exceptions.FailedToSendSMSException;
-import impl.SMSFactory;
-import impl.TwilioImplementation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
+import org.xml.sax.SAXException;
+/**
+ * This class is to make requests for new messages to send.
+ * @author javier
+ */
 public class Request {
+    /**
+     * Stores data about a specific request
+     */
     public class RequestData {
 
         public String to;
         public String txt;
         public String id;
-
+        @Override
         public String toString() {
             return "to: " + to + " text: " + txt + " id: " + id;
         }
     }
-
-    public List<RequestData> getXML() {
+    /**
+     * Retrieves all the pending requests from the web server.
+     * @return A list with the data for all the pending requests or an empty
+     * list if there are no pending requests.
+     */
+    public List<RequestData> getPendingRequests() {
         List<RequestData> lst = new LinkedList<>();
         URL xmlUrl;
         try {
@@ -76,24 +80,25 @@ public class Request {
         return lst;
     }
 
-    public Document parse(InputStream is) {
+    /**
+     * Helper method designed to help retrieve the data from a server request.
+     * @param is An input stream from the web server's response
+     * @return An XML Document.
+     */
+    private Document parse(InputStream is) {
         Document ret = null;
-        DocumentBuilderFactory domFactory;
-        DocumentBuilder builder;
-
         try {
-            domFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
             domFactory.setValidating(false);
             domFactory.setNamespaceAware(false);
-            builder = domFactory.newDocumentBuilder();
-
+            DocumentBuilder builder = domFactory.newDocumentBuilder();
             ret = builder.parse(is);
-        } catch (Exception ex) {
-            System.err.println("unable to load XML: " + ex);
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ret;
     }
-    public void checkFlag() {
+    public void sendResults() {
         RequestData obj = new RequestData();
                
         String urlText = "http://panthertext.com/scripts/check_flag.php";
@@ -110,7 +115,7 @@ public class Request {
                 System.out.println((char)in);
             is.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 }
