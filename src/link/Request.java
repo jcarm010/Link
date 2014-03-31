@@ -109,9 +109,11 @@ public class Request {
     }
     public void sendResults(List<RequestData> lst) {
         RequestData req = new RequestData();
-               
-        String urlText = "http://panthertext.com/scripts/check_flag.php";
         String someXmlContent = "<root>Flag<node>"+req.id+"</node><node>sent</node></root>";
+        sendResults(someXmlContent);
+    }
+    private final void sendResults(String xmlString){
+        String urlText = "http://panthertext.com/scripts/check_flag.php";
         try {
             URL obj = new URL(urlText);
             java.net.HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -119,7 +121,7 @@ public class Request {
             //add reuqest header
             con.setRequestMethod("POST");
 
-            String urlParameters = "XML="+someXmlContent;
+            String urlParameters = "XML="+xmlString;
 
             // Send post request
             con.setDoOutput(true);
