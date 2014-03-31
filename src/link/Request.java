@@ -25,6 +25,9 @@ import org.xml.sax.SAXException;
  * @author javier
  */
 public class Request {
+    public static enum FLAG{
+        SENT,FAILED,PENDING
+    }
     /**
      * Stores data about a specific request
      */
@@ -33,6 +36,10 @@ public class Request {
         public String to;
         public String txt;
         public String id;
+        public FLAG flag;
+        public RequestData(){
+            flag = FLAG.PENDING;
+        }
         @Override
         public String toString() {
             return "to: " + to + " text: " + txt + " id: " + id;

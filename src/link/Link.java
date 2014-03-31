@@ -5,10 +5,6 @@ import abstr.SMS;
 import abstr.SendSMSCommand;
 import abstr.exceptions.FailedToSendSMSException;
 import impl.SMSFactory;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -19,16 +15,17 @@ import java.util.List;
 public class Link {
     public static void main(String[] args) {      
         Request req = new Request();
+        SendSMSCommand comand = SMSFactory.getSMSCommand();
+        List<Request.RequestData> lst = req.getPendingRequests();
+        lst.stream().forEach((d) -> {
+            try {
+                comand.sendSMS(new SMS(d.txt), new PhoneNumber(d.to));
+                d.flag = Request.FLAG.SENT;
+            } catch (FailedToSendSMSException err) {
+                err.printStackTrace(System.err);
+                d.flag = Request.FLAG.FAILED;
+            }
+        });
         req.sendResults();
-//        SendSMSCommand comand = SMSFactory.getSMSCommand();
-//        List<Request.RequestData> lst = req.getXML();
-//        for (Request.RequestData d : lst) {
-//            try {
-//                comand.sendSMS(new SMS(d.txt), new PhoneNumber(d.to));
-//            } catch (FailedToSendSMSException err) {
-//                err.printStackTrace(System.err);
-//                //do something when fails to send
-//            }
-//        }
     }
 }
