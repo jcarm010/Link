@@ -49,7 +49,7 @@ public class Request {
      * @return A list with the data for all the pending requests or an empty
      * list if there are no pending requests.
      */
-    public List<RequestData> getPendingRequests() {
+    public final List<RequestData> getPendingRequests() {
         List<RequestData> lst = new LinkedList<>();
         URL xmlUrl;
         try {
@@ -107,12 +107,29 @@ public class Request {
         }
         return ret;
     }
-    public void sendResults(List<RequestData> lst) {
+    /**
+     * Sends results about a list of messages to the web server.
+     * @param lst The list of requests whose results need to be sent.
+     */
+    public final void sendResults(List<RequestData> lst) {
         RequestData req = new RequestData();
-        String someXmlContent = "<root>Flag<node>"+req.id+"</node><node>sent</node></root>";
-        sendResults(someXmlContent);
+        String someXmlContent = buildXMLResultString(lst);
+        sendXMLResults(someXmlContent);
     }
-    private final void sendResults(String xmlString){
+    /**
+     * Formats a request results as an XML String.
+     * @param lst The list of results to be formatted as XML.
+     * @return The XML String.
+     */
+    private String buildXMLResultString(List<RequestData> lst){
+        //"<root>Flag<node>"+req.id+"</node><node>sent</node></root>";
+        throw new RuntimeException("Not Implemented Yet");
+    }
+    /**
+     * Sends the results formatted as an XML String.
+     * @param xmlString The XML String
+     */
+    private void sendXMLResults(String xmlString){
         String urlText = "http://panthertext.com/scripts/check_flag.php";
         try {
             URL obj = new URL(urlText);
