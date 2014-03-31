@@ -107,7 +107,7 @@ public class Request {
         }
         return ret;
     }
-    public void sendResults() {
+    public void sendResults(List<RequestData> lst) {
         RequestData req = new RequestData();
                
         String urlText = "http://panthertext.com/scripts/check_flag.php";

@@ -26,6 +26,6 @@ public class Link {
                 d.flag = Request.FLAG.FAILED;
             }
         });
-        req.sendResults();
+        req.sendResults(lst);
     }
 }
