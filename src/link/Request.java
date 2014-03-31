@@ -112,7 +112,6 @@ public class Request {
      * @param lst The list of requests whose results need to be sent.
      */
     public final void sendResults(List<RequestData> lst) {
-        RequestData req = new RequestData();
         String someXmlContent = buildXMLResultString(lst);
         sendXMLResults(someXmlContent);
     }
