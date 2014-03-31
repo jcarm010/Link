@@ -1,8 +1,10 @@
 package link;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -99,21 +102,43 @@ public class Request {
         return ret;
     }
     public void sendResults() {
-        RequestData obj = new RequestData();
+        RequestData req = new RequestData();
                
         String urlText = "http://panthertext.com/scripts/check_flag.php";
-        String someXmlContent = "<root>Flag<node>"+obj.id+"</node><node>sent</node></root>";
+        String someXmlContent = "<root>Flag<node>"+req.id+"</node><node>sent</node></root>";
         try {
-            HttpURLConnection c = (HttpURLConnection) new URL(urlText).openConnection();
-            c.setDoOutput(true);
-            OutputStreamWriter writer = new OutputStreamWriter(c.getOutputStream(), "UTF-8");
-            writer.write(someXmlContent);
-            writer.close();
-            InputStream is = c.getInputStream();
-            int in;
-            while((in=is.read())!=-1)
-                System.out.println((char)in);
-            is.close();
+            URL obj = new URL(urlText);
+            java.net.HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            //add reuqest header
+            con.setRequestMethod("POST");
+
+            String urlParameters = "XML="+someXmlContent;
+
+            // Send post request
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
+
+            int responseCode = con.getResponseCode();
+            System.out.println("\nSending 'POST' request to URL : " + urlText);
+            System.out.println("Post parameters : " + urlParameters);
+            System.out.println("Response Code : " + responseCode);
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+            }
+            in.close();
+
+            //print result
+            System.out.println(response.toString());
         } catch (IOException e) {
             e.printStackTrace(System.err);
         }
