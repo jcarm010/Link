@@ -40,8 +40,8 @@ public class TwilioImplementation implements SendSMSCommand {
     @Override
     public final Map<PhoneNumber, List<SMS>> sendSMS(List<SMS> messages, List<PhoneNumber> toNumber) {
         Map<PhoneNumber, List<SMS>> failed = new HashMap<>();
-        for (SMS mes : messages) {
-            for (PhoneNumber toNum : toNumber) {
+        messages.stream().forEach((mes) -> {
+            toNumber.stream().forEach((toNum) -> {
                 try {
                     sendSMS(mes, toNum);
                 } catch (FailedToSendSMSException ex) {
@@ -53,8 +53,8 @@ public class TwilioImplementation implements SendSMSCommand {
                         failed.put(toNum, m);
                     }
                 }
-            }
-        }
+            });
+        });
         return failed;
     }
 

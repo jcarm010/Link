@@ -119,9 +119,9 @@ public class Request {
      * Sends results about a list of messages to the web server.
      * @param lst The list of requests whose results need to be sent.
      */
-    public final void sendResults(List<RequestData> lst) {
+    public final String sendResults(List<RequestData> lst) {
         String someXmlContent = buildXMLResultString(lst);
-        sendXMLResults(someXmlContent);
+        return sendXMLResults(someXmlContent);
     }
     /**
      * Formats a request results as an XML String.
@@ -163,7 +163,7 @@ public class Request {
      * Sends the results formatted as an XML String.
      * @param xmlString The XML String
      */
-    private void sendXMLResults(String xmlString){
+    private String sendXMLResults(String xmlString){
         String urlText = "http://panthertext.com/scripts/check_flag.php";
         try {
             URL obj = new URL(urlText);
@@ -181,9 +181,10 @@ public class Request {
             while ((inputLine = in.readLine()) != null) 
                     response.append(inputLine);
             in.close();
-            System.out.println(response.toString());
+            return response.toString();
         } catch (IOException e) {
             e.printStackTrace(System.err);
+            return null;
         }
     }
 }
