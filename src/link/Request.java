@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,7 +16,14 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -121,8 +129,35 @@ public class Request {
      * @return The XML String.
      */
     private String buildXMLResultString(List<RequestData> lst){
-        //"<root>Flag<node>"+req.id+"</node><node>sent</node></root>";
-        throw new RuntimeException("Not Implemented Yet");
+        String output=null;
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            // root elements
+            Document doc = docBuilder.newDocument();
+            Element rootElement = doc.createElement("report");
+            doc.appendChild(rootElement);
+            // report elements
+            lst.stream().forEach( d -> {
+                Element request = doc.createElement("request");
+                rootElement.appendChild(request);
+                Element id = doc.createElement("id");
+                id.setTextContent(d.id);
+                request.appendChild(id);
+                Element flag = doc.createElement("flag");
+                flag.setTextContent(d.flag.toString());
+                request.appendChild(flag);
+            });
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(doc), new StreamResult(writer));
+            output = writer.getBuffer().toString().replaceAll("\n|\r", "");
+        } catch (ParserConfigurationException | TransformerException pce) {
+            pce.printStackTrace(System.err);
+        } 
+        return output;
     }
     /**
      * Sends the results formatted as an XML String.
@@ -133,35 +168,19 @@ public class Request {
         try {
             URL obj = new URL(urlText);
             java.net.HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-            //add reuqest header
             con.setRequestMethod("POST");
-
             String urlParameters = "XML="+xmlString;
-
-            // Send post request
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(urlParameters);
             wr.flush();
             wr.close();
-
-            int responseCode = con.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + urlText);
-            System.out.println("Post parameters : " + urlParameters);
-            System.out.println("Response Code : " + responseCode);
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) 
                     response.append(inputLine);
-            }
             in.close();
-
-            //print result
             System.out.println(response.toString());
         } catch (IOException e) {
             e.printStackTrace(System.err);
