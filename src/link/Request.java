@@ -164,7 +164,8 @@ public class Request {
     }
     /**
      * Sends the results formatted as an XML String.
-     * @param xmlString The XML String
+     * @param xmlString The XML String.
+     * @return The response from the server.
      */
     private String sendXMLResults(String xmlString){
         String urlText = "https://panthertext.com/scripts/check_flag.php";
