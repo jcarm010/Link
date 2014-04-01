@@ -6,12 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,7 +36,6 @@ public class Request {
      * Stores data about a specific request
      */
     public class RequestData {
-
         public String to;
         public String txt;
         public String id;
@@ -63,39 +59,26 @@ public class Request {
         try {
             xmlUrl = new URL("https://panthertext.com/scripts/query_requests.php");
             HttpsURLConnection con = (HttpsURLConnection)xmlUrl.openConnection();
-            //InputStream in = xmlUrl.openStream();
             InputStream in = con.getInputStream();
             Document doc = parse(in);
             NodeList messages = doc.getElementsByTagName("message");
-            if (messages != null) {
-                for (int i = 0; i < messages.getLength(); i++) {
-                    Node msg = messages.item(i);
-                    NodeList data = msg.getChildNodes();
-                    RequestData obj = new RequestData();
-                    for (int j = 0; j < data.getLength(); j++) {
-                        Node inf = data.item(j);
-                        switch (inf.getNodeName()) {
-                            case "to":
-                                obj.to = inf.getTextContent();
-                                break;
-                            case "text":
-                                obj.txt = inf.getTextContent();
-                                break;
-                            case "id":
-                                obj.id = inf.getTextContent();
-                                break;
-                        }
+            for (int i = 0; i < messages.getLength(); i++) {
+                Node msg = messages.item(i);
+                NodeList data = msg.getChildNodes();
+                RequestData obj = new RequestData();
+                for (int j = 0; j < data.getLength(); j++) {
+                    Node inf = data.item(j);
+                    switch (inf.getNodeName()) {
+                        case "to": obj.to = inf.getTextContent(); break;
+                        case "text": obj.txt = inf.getTextContent(); break;
+                        case "id": obj.id = inf.getTextContent(); break;
                     }
-                    lst.add(obj);
                 }
-            } else {
-                //todo
+                lst.add(obj);
             }
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            ex.printStackTrace(System.err);
+        } 
         return lst;
     }
 
@@ -113,7 +96,7 @@ public class Request {
             DocumentBuilder builder = domFactory.newDocumentBuilder();
             ret = builder.parse(is);
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace(System.err);
         }
         return ret;
     }
