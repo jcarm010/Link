@@ -33,7 +33,7 @@ public class Link {
             }
         });
         String result = req.sendResults(lst);
-        System.out.println(result);
+        System.out.println("Server Response: "+result);
     }
     
     /**
