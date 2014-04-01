@@ -5,7 +5,7 @@ package abstr;
  * @author javier
  */
 public class SMS {
-    private String msg;
+    private final String msg;
     /**
      * Instantiates an SMS object.
      * @param msg The message

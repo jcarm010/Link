@@ -118,6 +118,7 @@ public class Request {
     /**
      * Sends results about a list of messages to the web server.
      * @param lst The list of requests whose results need to be sent.
+     * @return The response from the server as a String.
      */
     public final String sendResults(List<RequestData> lst) {
         String someXmlContent = buildXMLResultString(lst);

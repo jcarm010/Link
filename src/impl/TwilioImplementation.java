@@ -9,6 +9,7 @@ import com.twilio.sdk.TwilioRestException;
 import com.twilio.sdk.resource.factory.SmsFactory;
 import com.twilio.sdk.resource.instance.Sms;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -82,7 +83,7 @@ public class TwilioImplementation implements SendSMSCommand {
         PHONE_NOT_OWNED("15005550007"),
         QUEUE_IS_FULL("15005550008"),
         NO_ERROR("15005550006");
-        private String value;
+        private final String value;
         TestingFrom(String str) {
             this.value = str;
         }
@@ -98,7 +99,7 @@ public class TwilioImplementation implements SendSMSCommand {
         BLACK_LISTED("15005550004"),
         SMS_NOT_SUPPORTED("15005550009"),
         NO_ERROR("15005550006");
-        private String value;
+        private final String value;
         TestingTo(String str) {
             this.value = str;
         }
@@ -113,7 +114,7 @@ public class TwilioImplementation implements SendSMSCommand {
         Scanner scanner = null;
         try{
             scanner = new Scanner(file);
-        }catch(IOException err){
+        }catch(FileNotFoundException err){
             err.printStackTrace(System.err);
         }
         if(scanner!=null && scanner.hasNext()){
@@ -128,7 +129,7 @@ public class TwilioImplementation implements SendSMSCommand {
             }
             scanner.close();
         }else{
-            scanner.close();
+            if(scanner!=null)scanner.close();
             writeConfigurationFile();
         }
     }
@@ -169,8 +170,8 @@ public class TwilioImplementation implements SendSMSCommand {
     }
     
     private static class Option{
-        private String left;
-        private String right;
+        private final String left;
+        private final String right;
         public Option(String left,String right){
             this.left = left;
             this.right = right;
