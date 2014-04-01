@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,8 +61,10 @@ public class Request {
         List<RequestData> lst = new LinkedList<>();
         URL xmlUrl;
         try {
-            xmlUrl = new URL("http://panthertext.com/scripts/query_requests.php");
-            InputStream in = xmlUrl.openStream();
+            xmlUrl = new URL("https://panthertext.com/scripts/query_requests.php");
+            HttpsURLConnection con = (HttpsURLConnection)xmlUrl.openConnection();
+            //InputStream in = xmlUrl.openStream();
+            InputStream in = con.getInputStream();
             Document doc = parse(in);
             NodeList messages = doc.getElementsByTagName("message");
             if (messages != null) {
@@ -165,10 +167,10 @@ public class Request {
      * @param xmlString The XML String
      */
     private String sendXMLResults(String xmlString){
-        String urlText = "http://panthertext.com/scripts/check_flag.php";
+        String urlText = "https://panthertext.com/scripts/check_flag.php";
         try {
             URL obj = new URL(urlText);
-            java.net.HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            HttpsURLConnection con = (HttpsURLConnection)obj.openConnection();
             con.setRequestMethod("POST");
             String urlParameters = "XML="+xmlString;
             con.setDoOutput(true);
