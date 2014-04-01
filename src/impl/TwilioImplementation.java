@@ -77,7 +77,9 @@ public class TwilioImplementation implements SendSMSCommand {
             fromNumbers.offer(fNum);
         }
     }
-    
+    /**
+     * From numbers for testing purposes.
+     */
     public enum TestingFrom {
         INVALID_PHONE("15005550001"),
         PHONE_NOT_OWNED("15005550007"),
@@ -91,7 +93,9 @@ public class TwilioImplementation implements SendSMSCommand {
             return value;
         }
     }
-
+    /**
+     * To numbers for testing purposes.
+     */
     public enum TestingTo {
         INVALID_PHONE("15005550001"),
         CANNOT_ROUTE("15005550002"),
@@ -107,7 +111,9 @@ public class TwilioImplementation implements SendSMSCommand {
             return value;
         }
     }
-    
+    /**
+     * Loads configuration from twilio_config file.
+     */
     private static void loadConfiguration(){
         File file = new File(getExecutablePath()+"twilio_config");
         if(!file.exists()) writeConfigurationFile();
