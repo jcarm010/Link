@@ -2,6 +2,9 @@ package link;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +12,9 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,6 +35,54 @@ import org.xml.sax.SAXException;
  * @author javier
  */
 public class Request {
+    private static String pUsername = null;
+    private static String pPassword = null;
+    public Request(){
+        setCredentials();
+    }
+    private static void saveCredentials(){
+        File file = new File("ptconfig");
+        try (FileWriter writer = new FileWriter(file)) {
+            String line = "username="+pUsername+"\n";
+            writer.write(line);
+            line = "password="+pPassword+"\n";
+            writer.write(line);
+            writer.close();
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
+    }
+    private static void setCredentials(){
+        if(pUsername==null || pPassword==null){
+            File file = new File("ptconfig");
+            try (Scanner scanner = new Scanner(file)) {
+                while(scanner.hasNext()){
+                    String line = scanner.nextLine();
+                    KeyValuePair pair = parseLine(line);
+                    if(pair!=null)switch(pair.key){
+                        case "username":Request.pUsername = pair.value;break;
+                        case "password":Request.pPassword = pair.value;break;
+                    }
+                }
+                scanner.close();
+            } catch (FileNotFoundException ex) {
+                saveCredentials();
+            }
+        }
+    }
+    private static KeyValuePair parseLine(String line){
+        if(line==null) return null;
+        int index = line.indexOf("=");
+        if(index<0) return null;
+        KeyValuePair pair = new KeyValuePair();
+        pair.key = line.substring(0,index);
+        pair.value = line.substring(index+1);
+        return pair;
+    }
+    private static class KeyValuePair{
+        public String key;
+        public String value;
+    }
     public static enum FLAG{
         SENT,FAILED,PENDING
     }
@@ -59,6 +113,13 @@ public class Request {
         try {
             xmlUrl = new URL("https://panthertext.com/scripts/query_requests.php");
             HttpsURLConnection con = (HttpsURLConnection)xmlUrl.openConnection();
+            con.setRequestMethod("POST");
+            String urlParameters = "username="+pUsername+"&password="+pPassword;
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
             InputStream in = con.getInputStream();
             Document doc = parse(in);
             NodeList messages = doc.getElementsByTagName("message");
@@ -156,7 +217,7 @@ public class Request {
             URL obj = new URL(urlText);
             HttpsURLConnection con = (HttpsURLConnection)obj.openConnection();
             con.setRequestMethod("POST");
-            String urlParameters = "XML="+xmlString;
+            String urlParameters = "XML="+xmlString+"&username="+pUsername+"&password="+pPassword;
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(urlParameters);

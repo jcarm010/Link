@@ -14,7 +14,6 @@ import java.util.List;
 
 /**
  * Main class to run Link
- *
  * @author javier
  */
 public class Link {
